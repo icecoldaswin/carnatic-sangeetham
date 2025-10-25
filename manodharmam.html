@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnatic Raga Practice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a1a2e;
+            --secondary-bg: #16213e;
+            --card-bg: #0f3460;
+            --accent: #e94560;
+            --text-primary: #eaeaea;
+            --text-secondary: #a0a0a0;
+            --border-color: #533483;
+            --highlight: #00d9ff;
+        }
+
+        /* Configuration - Set your image URL here */
+        const IMAGE_SRC = ""; /* Leave empty for no background, or add URL like "https://example.com/image.jpg" */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body.with-background::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        body.with-background::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 100%);
+            z-index: -1;
+        }
+
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .dropdown-toggle {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-toggle:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        .dropdown-menu {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: var(--text-primary);
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: var(--highlight);
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .subheader {
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .moorchana-display {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .moorchana-display h3 {
+            color: var(--highlight);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .moorchana-line {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin: 10px 0;
+            letter-spacing: 6px;
+            font-weight: 500;
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .selection-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-size: 1rem;
+            font-weight: 500;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        .selection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(233, 69, 96, 0.4);
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--card-bg) 0%, #1a4d6d 100%);
+        }
+
+        .selection-card.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+        }
+
+        .large-button {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px 25px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            margin: 15px;
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .large-button:hover {
+            transform: scale(1.05);
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.5);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Playing layout */
+        .playing-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .swara-display-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            min-height: 250px;
+        }
+
+        .swara-card {
+            background: var(--card-bg);
+            border: 4px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            max-width: 200px;
+            min-width: 150px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            color: var(--highlight);
+            transition: all 0.6s ease;
+        }
+
+        .swara-card.current {
+            transform: scale(1);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .swara-card.next {
+            transform: scale(0.7) translateX(30px);
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .swara-card.previous {
+            transform: scale(0.7) translateX(-30px);
+            opacity: 0;
+            z-index: 0;
+        }
+
+        .swara-card.high-pitch {
+            border-top: 6px solid var(--accent);
+            border-left: none;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .swara-card.low-pitch {
+            border-bottom: 6px solid var(--accent);
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .swara-card.normal-pitch {
+            border: 4px solid var(--border-color);
+        }
+
+        .controls-panel {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls-panel h3 {
+            color: var(--highlight);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+            text-align: center;
+        }
+
+        .history-strip {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 52, 96, 0.95);
+            border-top: 3px solid var(--border-color);
+            padding: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(10px);
+        }
+
+        .history-item {
+            display: inline-block;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-right: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            position: relative;
+            color: var(--text-primary);
+        }
+
+        .history-item.high-pitch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .history-item.low-pitch::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .speed-container {
+            margin: 30px auto;
+            padding: 30px;
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+
+        .speed-container label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--highlight);
+            text-align: center;
+        }
+
+        .interactive-box-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-box, .jump-box {
+            width: 100%;
+            height: 100px;
+            background: var(--secondary-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: ns-resize;
+            user-select: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .speed-box:hover, .jump-box:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 25px rgba(233, 69, 96, 0.3);
+        }
+
+        .speed-value, .jump-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--highlight);
+            text-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .speed-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .dial-indicator {
+            position: absolute;
+            right: 8px;
+            width: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+            opacity: 0.5;
+        }
+
+        .dial-notch {
+            width: 16px;
+            height: 2px;
+            background: var(--border-color);
+            border-radius: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .dial-notch.active {
+            background: var(--accent);
+            width: 24px;
+            height: 3px;
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .speed-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+
+        .control-button {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin: 8px;
+            color: var(--text-primary);
+            width: 100%;
+        }
+
+        .control-button:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .control-button.stop {
+            background: #d32f2f;
+            color: white;
+            border-color: #b71c1c;
+        }
+
+        .control-button.stop:hover {
+            background: #b71c1c;
+            box-shadow: 0 6px 20px rgba(211, 47, 47, 0.5);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .swara-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .swara-select-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .swara-select-card:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+        }
+
+        .swara-select-card.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+        }
+
+        @media (max-width: 968px) {
+            .playing-container {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-panel {
+                order: 2;
+            }
+
+            .swara-display-container {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .large-button {
+                font-size: 1.2rem;
+                padding: 25px 20px;
+            }
+            
+            .swara-card {
+                font-size: 2.5rem;
+                padding: 25px;
+                min-width: 120px;
+            }
+            
+            .selection-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .swara-display-container {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <div class="dropdown">
+            <button class="dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="currentLanguage">English</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                <li><a class="dropdown-item" href="#" data-lang="te">తెలుగు</a></li>
+                <li><a class="dropdown-item" href="#" data-lang="hi">हिंदी</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <div class="header">
+            <h1 id="mainHeader">Select a Ragam</h1>
+            <div id="subheaderContainer"></div>
+        </div>
+
+        <div id="contentArea"></div>
+    </div>
+
+    <!-- History Strip -->
+    <div class="history-strip" id="historyStrip"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration - Set your image URL here
+        const IMAGE_SRC = ""; // Leave empty for no background, or add URL like "https://example.com/image.jpg"
+
+        // Apply background if IMAGE_SRC is set
+        if (IMAGE_SRC) {
+            document.body.classList.add('with-background');
+            const style = document.createElement('style');
+            style.textContent = `
+                body.with-background::before {
+                    background-image: url(${IMAGE_SRC});
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Audio Context for generating sounds
+        let audioContext = null;
+        let metronomeSoundEnabled = true;
+        let shrutiSoundEnabled = true;
+
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Generate metronome click sound
+        function playMetronomeSound() {
+            if (!metronomeSoundEnabled || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 1000;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }
+
+        // Shruti frequencies (in Hz) for Carnatic music
+        const shrutiFrequencies = {
+            'S': 261.63,   // C (Sa)
+            'R1': 277.18,  // C# (Shuddha Rishabham)
+            'R2': 293.66,  // D (Chatushruti Rishabham)
+            'G2': 311.13,  // D# (Sadharana Gandharam)
+            'G3': 329.63,  // E (Antara Gandharam)
+            'M1': 349.23,  // F (Shuddha Madhyamam)
+            'M2': 369.99,  // F# (Prati Madhyamam)
+            'P': 392.00,   // G (Panchamam)
+            'D1': 415.30,  // G# (Shuddha Dhaivatham)
+            'D2': 440.00,  // A (Chatushruti Dhaivatham)
+            'N2': 466.16,  // A# (Kaisiki Nishadam)
+            'N3': 493.88,  // B (Kakali Nishadam)
+            'Ṡ': 523.25    // C (Upper Sa)
+        };
+
+        // Play shruti sound for a swara
+        function playShrutiSound(swara, pitch) {
+            if (!shrutiSoundEnabled || !audioContext) return;
+            
+            let frequency = shrutiFrequencies[swara];
+            if (!frequency) return;
+            
+            // Adjust frequency based on pitch
+            if (pitch === 'high') {
+                frequency *= 2; // One octave higher
+            } else if (pitch === 'low') {
+                frequency /= 2; // One octave lower
+            }
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.3);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.8);
+        }
+
+        // Translations
+        const translations = {
+            en: {
+                selectRagam: "Select a Ragam",
+                selectType: "Select Type",
+                sanchara: "Sanchara",
+                aalapan: "Aalapan",
+                speed: "Speed",
+                jumpDistance: "Jump Distance",
+                selectTargetSwara: "Select Target Swara",
+                stop: "Stop",
+                start: "Start",
+                speedHint: "Scroll or swipe to adjust",
+                aarohanam: "Aarohanam (Ascending)",
+                avarohanam: "Avarohanam (Descending)",
+                milliseconds: "ms",
+                metronome: "Metronome",
+                shrutiSound: "Shruti Sound",
+                controls: "Controls"
+            },
+            te: {
+                selectRagam: "రాగం ఎంచుకోండి",
+                selectType: "రకం ఎంచుకోండి",
+                sanchara: "సంచారం",
+                aalapan: "ఆలాపన",
+                speed: "వేగం",
+                jumpDistance: "దూరం",
+                selectTargetSwara: "స్వరం ఎంచుకోండి",
+                stop: "ఆపండి",
+                start: "ప్రారంభించు",
+                speedHint: "స్క్రోల్ లేదా స్వైప్ చేయండి",
+                aarohanam: "ఆరోహణం",
+                avarohanam: "అవరోహణం",
+                milliseconds: "మి.సె",
+                metronome: "మెట్రనోమ్",
+                shrutiSound: "శ్రుతి ధ్వని",
+                controls: "నియంత్రణలు"
+            },
+            hi: {
+                selectRagam: "राग चुनें",
+                selectType: "प्रकार चुनें",
+                sanchara: "संचार",
+                aalapan: "आलापन",
+                speed: "गति",
+                jumpDistance: "दूरी",
+                selectTargetSwara: "स्वर चुनें",
+                stop: "रोकें",
+                start: "शुरू करें",
+                speedHint: "स्क्रॉल या स्वाइप करें",
+                aarohanam: "आरोहण",
+                avarohanam: "अवरोहण",
+                milliseconds: "मि.से",
+                metronome: "मेट्रोनोम",
+                shrutiSound: "श्रुति ध्वनि",
+                controls: "नियंत्रण"
+            }
+        };
+
+        // Swara translations (fixed high pitch Sa for Telugu)
+        const swaraTranslations = {
+            en: {
+                "S": "S", "R1": "R1", "R2": "R2", "G2": "G2", "G3": "G3",
+                "M1": "M1", "M2": "M2", "P": "P", "D1": "D1", "D2": "D2",
+                "N2": "N2", "N3": "N3", "Ṡ": "Ṡ"
+            },
+            te: {
+                "S": "స", "R1": "రి1", "R2": "రి", "G2": "గ", "G3": "గ3",
+                "M1": "మ", "M2": "మ2", "P": "ప", "D1": "ద1", "D2": "ద",
+                "N2": "ని", "N3": "ని3", "Ṡ": "స॰"
+            },
+            hi: {
+                "S": "सा", "R1": "रे1", "R2": "रे", "G2": "ग", "G3": "ग3",
+                "M1": "म", "M2": "म2", "P": "प", "D1": "ध1", "D2": "ध",
+                "N2": "नि", "N3": "नि3", "Ṡ": "सां"
+            }
+        };
+
+        // Ragam name translations
+        const ragamTranslations = {
+            en: {
+                "Mayamalavagowla": "Mayamalavagowla",
+                "Sankarabharanam": "Sankarabharanam",
+                "Kalyani": "Kalyani",
+                "Kharaharapriya": "Kharaharapriya",
+                "Bhairavi": "Bhairavi",
+                "Todi": "Todi",
+                "Hamsadhwani": "Hamsadhwani",
+                "Mohanam": "Mohanam"
+            },
+            te: {
+                "Mayamalavagowla": "మాయామాళవగౌళ",
+                "Sankarabharanam": "శంకరాభరణం",
+                "Kalyani": "కళ్యాణి",
+                "Kharaharapriya": "ఖరహరప్రియ",
+                "Bhairavi": "భైరవి",
+                "Todi": "తోడి",
+                "Hamsadhwani": "హంసధ్వని",
+                "Mohanam": "మోహనం"
+            },
+            hi: {
+                "Mayamalavagowla": "मायामालवगौला",
+                "Sankarabharanam": "शंकराभरणम्",
+                "Kalyani": "कल्याणी",
+                "Kharaharapriya": "खरहरप्रिया",
+                "Bhairavi": "भैरवी",
+                "Todi": "टोडी",
+                "Hamsadhwani": "हंसध्वनि",
+                "Mohanam": "मोहनम्"
+            }
+        };
+
+        // Carnatic Ragams with scale information
+        const ragams = {
+            "Mayamalavagowla": {
+                arohanam: ["S", "R1", "G3", "M1", "P", "D1", "N3", "Ṡ"],
+                avarohanam: ["Ṡ", "N3", "D1", "P", "M1", "G3", "R1", "S"]
+            },
+            "Sankarabharanam": {
+                arohanam: ["S", "R2", "G3", "M1", "P", "D2", "N3", "Ṡ"],
+                avarohanam: ["Ṡ", "N3", "D2", "P", "M1", "G3", "R2", "S"]
+            },
+            "Kalyani": {
+                arohanam: ["S", "R2", "G3", "M2", "P", "D2", "N3", "Ṡ"],
+                avarohanam: ["Ṡ", "N3", "D2", "P", "M2", "G3", "R2", "S"]
+            },
+            "Kharaharapriya": {
+                arohanam: ["S", "R2", "G2", "M1", "P", "D2", "N2", "Ṡ"],
+                avarohanam: ["Ṡ", "N2", "D2", "P", "M1", "G2", "R2", "S"]
+            },
+            "Bhairavi": {
+                arohanam: ["S", "R2", "G2", "M1", "P", "D1", "N2", "Ṡ"],
+                avarohanam: ["Ṡ", "N2", "D1", "P", "M1", "G2", "R2", "S"]
+            },
+            "Todi": {
+                arohanam: ["S", "R1", "G2", "M2", "P", "D1", "N2", "Ṡ"],
+                avarohanam: ["Ṡ", "N2", "D1", "P", "M2", "G2", "R1", "S"]
+            },
+            "Hamsadhwani": {
+                arohanam: ["S", "R2", "G3", "P", "N3", "Ṡ"],
+                avarohanam: ["Ṡ", "N3", "P", "G3", "R2", "S"]
+            },
+            "Mohanam": {
+                arohanam: ["S", "R2", "G3", "P", "D2", "Ṡ"],
+                avarohanam: ["Ṡ", "D2", "P", "G3", "R2", "S"]
+            }
+        };
+
+        // State management
+        let currentLanguage = localStorage.getItem('language') || 'en';
+        let selectedRagam = null;
+        let selectedType = null;
+        let selectedTargetSwara = null;
+        let speed = 1500;
+        let jumpDistance = 3;
+        let isPlaying = false;
+        let stopRequested = false;
+        let currentInterval = null;
+        let lastSwara = null;
+        let nextSwaraData = null;
+        let currentSwaraData = null;
+        let playTimeout = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setLanguage(currentLanguage);
+            showRagamSelection();
+        });
+
+        // Language selector
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                setLanguage(lang);
+            });
+        });
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            const langNames = { en: 'English', te: 'తెలుగు', hi: 'हिंदी' };
+            document.getElementById('currentLanguage').textContent = langNames[lang];
+            
+            // Re-render current view with new language
+            if (!selectedRagam) {
+                showRagamSelection();
+            } else if (selectedRagam && !selectedType) {
+                showMoorchanaAndTypeSelection();
+            } else if (selectedType && selectedType === 'aalapan' && !selectedTargetSwara) {
+                showSwaraSelection();
+            } else if (selectedType && !isPlaying) {
+                showControls();
+            } else if (isPlaying) {
+                // Update playing interface labels
+                updatePlayingInterfaceLabels();
+            }
+        }
+
+        function updatePlayingInterfaceLabels() {
+            const controlsTitle = document.querySelector('.controls-panel h3');
+            const speedLabel = document.querySelector('.control-group .control-label');
+            const jumpLabel = document.querySelectorAll('.control-group .control-label')[1];
+            const stopButton = document.querySelector('.control-button.stop');
+            const speedHints = document.querySelectorAll('.speed-hint');
+            const toggleLabels = document.querySelectorAll('.toggle-label');
+            
+            if (controlsTitle) controlsTitle.textContent = t('controls');
+            if (speedLabel) speedLabel.textContent = t('speed');
+            if (jumpLabel) jumpLabel.textContent = t('jumpDistance');
+            if (stopButton) stopButton.textContent = t('stop');
+            speedHints.forEach(hint => {
+                if (hint) hint.textContent = t('speedHint');
+            });
+            
+            if (toggleLabels.length >= 2) {
+                toggleLabels[0].textContent = t('metronome');
+                toggleLabels[1].textContent = t('shrutiSound');
+            }
+        }
+
+        function t(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        function ts(swara) {
+            return swaraTranslations[currentLanguage][swara] || swara;
+        }
+
+        function tr(ragam) {
+            return ragamTranslations[currentLanguage][ragam] || ragam;
+        }
+
+        function createDialIndicator() {
+            const dial = document.createElement('div');
+            dial.className = 'dial-indicator';
+            for (let i = 0; i < 10; i++) {
+                const notch = document.createElement('div');
+                notch.className = 'dial-notch';
+                notch.dataset.index = i;
+                dial.appendChild(notch);
+            }
+            return dial;
+        }
+
+        function updateDialPosition(value, min, max, dialElement) {
+            const notches = dialElement.querySelectorAll('.dial-notch');
+            const percentage = (value - min) / (max - min);
+            const activeIndex = Math.floor(percentage * 10);
+            
+            notches.forEach((notch, index) => {
+                if (index === activeIndex) {
+                    notch.classList.add('active');
+                } else {
+                    notch.classList.remove('active');
+                }
+            });
+        }
+
+        function showRagamSelection() {
+            document.getElementById('mainHeader').textContent = t('selectRagam');
+            document.getElementById('subheaderContainer').innerHTML = '';
+            
+            const html = `
+                <div class="selection-grid">
+                    ${Object.keys(ragams).map(ragam => `
+                        <div class="selection-card" onclick="selectRagam('${ragam}')">
+                            ${tr(ragam)}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function selectRagam(ragam) {
+            selectedRagam = ragam;
+            animateHeaderTransition(tr(ragam), () => {
+                showMoorchanaAndTypeSelection();
+            });
+        }
+
+        function showMoorchanaAndTypeSelection() {
+            const moorchana = ragams[selectedRagam];
+            
+            const html = `
+                <div class="moorchana-display">
+                    <h3>${t('aarohanam')}</h3>
+                    <div class="moorchana-line">${moorchana.arohanam.map(s => ts(s)).join('  ')}</div>
+                    <h3 style="margin-top: 20px;">${t('avarohanam')}</h3>
+                    <div class="moorchana-line">${moorchana.avarohanam.map(s => ts(s)).join('  ')}</div>
+                </div>
+                
+                <div class="subheader" style="text-align: center; margin: 30px 0 15px 0;">${t('selectType')}</div>
+                
+                <div class="button-container">
+                    <div class="large-button" onclick="selectType('sanchara')">
+                        ${t('sanchara')}
+                    </div>
+                    <div class="large-button" onclick="selectType('aalapan')">
+                        ${t('aalapan')}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function selectType(type) {
+            selectedType = type;
+            animateSubheaderTransition(t(type), () => {
+                if (type === 'aalapan') {
+                    showSwaraSelection();
+                } else {
+                    showControls();
+                }
+            });
+        }
+
+        function showSwaraSelection() {
+            const allSwaras = [...new Set([...ragams[selectedRagam].arohanam, ...ragams[selectedRagam].avarohanam])];
+            
+            const html = `
+                <div class="speed-container">
+                    <label>${t('selectTargetSwara')}</label>
+                    <div class="swara-selection-grid">
+                        ${allSwaras.map(swara => `
+                            <div class="swara-select-card" onclick="selectTargetSwara('${swara}')">
+                                ${ts(swara)}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function selectTargetSwara(swara) {
+            selectedTargetSwara = swara;
+            document.querySelectorAll('.swara-select-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            setTimeout(() => {
+                showControls();
+            }, 300);
+        }
+
+        function showControls() {
+            const html = `
+                <div class="speed-container">
+                    <label>${t('speed')}</label>
+                    <div class="interactive-box-wrapper">
+                        <div class="speed-box" id="speedBox">
+                            <div class="speed-value">${speed}</div>
+                            <div class="speed-label">${t('milliseconds')}</div>
+                        </div>
+                    </div>
+                    <div class="speed-hint">${t('speedHint')}</div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="control-button" onclick="startPractice()">${t('start')}</button>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+            
+            const speedBox = document.getElementById('speedBox');
+            const dial = createDialIndicator();
+            speedBox.appendChild(dial);
+            updateDialPosition(speed, 100, 3000, dial);
+            
+            setupSpeedBox();
+        }
+
+        function setupSpeedBox() {
+            const speedBox = document.getElementById('speedBox');
+            const dial = speedBox.querySelector('.dial-indicator');
+            let startY = 0;
+            let startSpeed = speed;
+            
+            // Mouse wheel
+            speedBox.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 50 : -50;
+                speed = Math.max(100, Math.min(3000, speed + delta));
+                updateSpeedDisplay();
+                updateDialPosition(speed, 100, 3000, dial);
+            });
+            
+            // Touch events
+            speedBox.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+                startSpeed = speed;
+            });
+            
+            speedBox.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const currentY = e.touches[0].clientY;
+                const diff = startY - currentY;
+                speed = Math.max(100, Math.min(3000, startSpeed + diff * 2));
+                updateSpeedDisplay();
+                updateDialPosition(speed, 100, 3000, dial);
+            });
+            
+            // Mouse drag
+            let isDragging = false;
+            speedBox.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startY = e.clientY;
+                startSpeed = speed;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    const diff = startY - e.clientY;
+                    speed = Math.max(100, Math.min(3000, startSpeed + diff * 2));
+                    updateSpeedDisplay();
+                    updateDialPosition(speed, 100, 3000, dial);
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+        }
+
+        function updateSpeedDisplay() {
+            const speedValue = document.querySelector('.speed-value');
+            if (speedValue) {
+                speedValue.textContent = speed;
+            }
+        }
+
+        function setupJumpBox() {
+            const jumpBox = document.getElementById('jumpBox');
+            if (!jumpBox) return;
+            
+            const dial = createDialIndicator();
+            jumpBox.appendChild(dial);
+            updateDialPosition(jumpDistance, 1, 7, dial);
+            
+            let startY = 0;
+            let startJump = jumpDistance;
+            
+            // Mouse wheel
+            jumpBox.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 1 : -1;
+                jumpDistance = Math.max(1, Math.min(7, jumpDistance + delta));
+                updateJumpDisplay();
+                updateDialPosition(jumpDistance, 1, 7, dial);
+            });
+            
+            // Touch events
+            jumpBox.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+                startJump = jumpDistance;
+            });
+            
+            jumpBox.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const currentY = e.touches[0].clientY;
+                const diff = Math.floor((startY - currentY) / 20);
+                jumpDistance = Math.max(1, Math.min(7, startJump + diff));
+                updateJumpDisplay();
+                updateDialPosition(jumpDistance, 1, 7, dial);
+            });
+            
+            // Mouse drag
+            let isDragging = false;
+            jumpBox.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startY = e.clientY;
+                startJump = jumpDistance;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    const diff = Math.floor((startY - e.clientY) / 20);
+                    jumpDistance = Math.max(1, Math.min(7, startJump + diff));
+                    updateJumpDisplay();
+                    updateDialPosition(jumpDistance, 1, 7, dial);
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+        }
+
+        function updateJumpDisplay() {
+            const jumpValue = document.querySelector('.jump-value');
+            if (jumpValue) {
+                jumpValue.textContent = jumpDistance;
+            }
+        }
+
+        function toggleMetronome() {
+            metronomeSoundEnabled = !metronomeSoundEnabled;
+            const toggle = document.getElementById('metronomeToggle');
+            if (toggle) {
+                if (metronomeSoundEnabled) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+            }
+        }
+
+        function toggleShruti() {
+            shrutiSoundEnabled = !shrutiSoundEnabled;
+            const toggle = document.getElementById('shrutiToggle');
+            if (toggle) {
+                if (shrutiSoundEnabled) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+            }
+        }
+
+        function startPractice() {
+            // Initialize audio context on user interaction
+            initAudioContext();
+            
+            isPlaying = true;
+            stopRequested = false;
+            lastSwara = null;
+            
+            const html = `
+                <div class="playing-container">
+                    <div class="swara-display-container" id="swaraDisplay">
+                        <div class="swara-card current" id="currentSwara"></div>
+                        <div class="swara-card next" id="nextSwara"></div>
+                    </div>
+                    
+                    <div class="controls-panel">
+                        <h3>${t('controls')}</h3>
+                        
+                        <div class="control-group">
+                            <div class="control-label">${t('speed')}</div>
+                            <div class="interactive-box-wrapper">
+                                <div class="speed-box" id="speedBoxPlaying">
+                                    <div class="speed-value">${speed}</div>
+                                    <div class="speed-label">${t('milliseconds')}</div>
+                                </div>
+                            </div>
+                            <div class="speed-hint">${t('speedHint')}</div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-label">${t('jumpDistance')}</div>
+                            <div class="interactive-box-wrapper">
+                                <div class="jump-box" id="jumpBox">
+                                    <div class="jump-value">${jumpDistance}</div>
+                                </div>
+                            </div>
+                            <div class="speed-hint">${t('speedHint')}</div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="toggle-container">
+                                <span class="toggle-label">${t('metronome')}</span>
+                                <div class="toggle-switch ${metronomeSoundEnabled ? 'active' : ''}" id="metronomeToggle" onclick="toggleMetronome()"></div>
+                            </div>
+                            <div class="toggle-container">
+                                <span class="toggle-label">${t('shrutiSound')}</span>
+                                <div class="toggle-switch ${shrutiSoundEnabled ? 'active' : ''}" id="shrutiToggle" onclick="toggleShruti()"></div>
+                            </div>
+                        </div>
+                        
+                        <button class="control-button stop" onclick="stopPractice()">${t('stop')}</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+            
+            // Setup speed control for playing state
+            const speedBoxPlaying = document.getElementById('speedBoxPlaying');
+            const speedDial = createDialIndicator();
+            speedBoxPlaying.appendChild(speedDial);
+            updateDialPosition(speed, 100, 3000, speedDial);
+            setupSpeedBoxPlaying(speedDial);
+            
+            setupJumpBox();
+            
+            // Initialize with first two swaras
+            currentSwaraData = generateNextSwara();
+            nextSwaraData = generateNextSwara();
+            
+            displayInitialSwaras();
+            
+            playTimeout = setTimeout(() => playNextSwara(), speed);
+        }
+
+        function setupSpeedBoxPlaying(dial) {
+            const speedBox = document.getElementById('speedBoxPlaying');
+            let startY = 0;
+            let startSpeed = speed;
+            
+            // Mouse wheel
+            speedBox.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 50 : -50;
+                speed = Math.max(100, Math.min(3000, speed + delta));
+                updateSpeedDisplay();
+                updateDialPosition(speed, 100, 3000, dial);
+            });
+            
+            // Touch events
+            speedBox.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+                startSpeed = speed;
+            });
+            
+            speedBox.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const currentY = e.touches[0].clientY;
+                const diff = startY - currentY;
+                speed = Math.max(100, Math.min(3000, startSpeed + diff * 2));
+                updateSpeedDisplay();
+                updateDialPosition(speed, 100, 3000, dial);
+            });
+            
+            // Mouse drag
+            let isDragging = false;
+            speedBox.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startY = e.clientY;
+                startSpeed = speed;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    const diff = startY - e.clientY;
+                    speed = Math.max(100, Math.min(3000, startSpeed + diff * 2));
+                    updateSpeedDisplay();
+                    updateDialPosition(speed, 100, 3000, dial);
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+        }
+
+        function displayInitialSwaras() {
+            const currentCard = document.getElementById('currentSwara');
+            const nextCard = document.getElementById('nextSwara');
+            
+            currentCard.textContent = ts(currentSwaraData.display);
+            currentCard.className = `swara-card current ${currentSwaraData.pitch}-pitch`;
+            
+            nextCard.textContent = ts(nextSwaraData.display);
+            nextCard.className = `swara-card next ${nextSwaraData.pitch}-pitch`;
+            
+            // Play initial shruti sound (even for dots, play the actual swara)
+            playShrutiSound(currentSwaraData.swara, currentSwaraData.pitch);
+        }
+
+        function generateNextSwara() {
+            const swarasInRaga = selectedType === 'aalapan' 
+                ? ragams[selectedRagam].arohanam 
+                : [...new Set([...ragams[selectedRagam].arohanam, ...ragams[selectedRagam].avarohanam])];
+            
+            const shouldRepeat = Math.random() < 0.3 && lastSwara;
+            let swara, pitch, display;
+            
+            if (shouldRepeat) {
+                display = '.';
+                swara = lastSwara.swara;
+                pitch = lastSwara.pitch;
+            } else {
+                // Use jump distance to determine how far to jump
+                if (lastSwara && Math.random() < 0.7) { // 70% chance to use jump distance
+                    const currentIndex = swarasInRaga.indexOf(lastSwara.swara);
+                    if (currentIndex !== -1) {
+                        // Jump forward or backward by jumpDistance
+                        const direction = Math.random() < 0.5 ? 1 : -1;
+                        let newIndex = currentIndex + (direction * jumpDistance);
+                        
+                        // Wrap around if needed
+                        if (newIndex < 0) {
+                            newIndex = swarasInRaga.length + newIndex;
+                        } else if (newIndex >= swarasInRaga.length) {
+                            newIndex = newIndex - swarasInRaga.length;
+                        }
+                        
+                        swara = swarasInRaga[newIndex];
+                    } else {
+                        swara = swarasInRaga[Math.floor(Math.random() * swarasInRaga.length)];
+                    }
+                } else {
+                    // Random swara
+                    swara = swarasInRaga[Math.floor(Math.random() * swarasInRaga.length)];
+                }
+                
+                pitch = ['low', 'normal', 'high'][Math.floor(Math.random() * 3)];
+                display = swara;
+                lastSwara = { swara, pitch };
+            }
+            
+            return { swara, pitch, display };
+        }
+
+        function stopPractice() {
+            stopRequested = true;
+            if (playTimeout) {
+                clearTimeout(playTimeout);
+            }
+        }
+
+        function playNextSwara() {
+            if (!isPlaying || stopRequested) {
+                if (stopRequested && selectedType === 'aalapan' && selectedTargetSwara) {
+                    // Gracefully end at target swara
+                    const targetData = {
+                        swara: selectedTargetSwara,
+                        pitch: 'normal',
+                        display: selectedTargetSwara
+                    };
+                    transitionToNext(targetData);
+                    playTimeout = setTimeout(() => {
+                        isPlaying = false;
+                        stopRequested = false;
+                    }, speed);
+                } else {
+                    isPlaying = false;
+                    stopRequested = false;
+                }
+                return;
+            }
+            
+            // Play metronome sound
+            playMetronomeSound();
+            
+            // Move next to current
+            transitionToNext(nextSwaraData);
+            
+            // Generate new next
+            nextSwaraData = generateNextSwara();
+            
+            // Update next card
+            setTimeout(() => {
+                const nextCard = document.getElementById('nextSwara');
+                if (nextCard) {
+                    nextCard.textContent = ts(nextSwaraData.display);
+                    nextCard.className = `swara-card next ${nextSwaraData.pitch}-pitch`;
+                }
+            }, 100);
+            
+            playTimeout = setTimeout(() => playNextSwara(), speed);
+        }
+
+        function transitionToNext(swaraData) {
+            const currentCard = document.getElementById('currentSwara');
+            const nextCard = document.getElementById('nextSwara');
+            
+            if (!currentCard || !nextCard) return;
+            
+            // Always play shruti sound for the actual swara (even if display is '.')
+            playShrutiSound(swaraData.swara, swaraData.pitch);
+            
+            // Add to history
+            addToHistory(swaraData.display, swaraData.pitch);
+            
+            // Animate transition
+            currentCard.classList.remove('current');
+            currentCard.classList.add('previous');
+            
+            nextCard.classList.remove('next');
+            nextCard.classList.add('current');
+            
+            // After transition, reset
+            setTimeout(() => {
+                currentCard.textContent = ts(swaraData.display);
+                currentCard.className = `swara-card current ${swaraData.pitch}-pitch`;
+                
+                currentSwaraData = swaraData;
+            }, 100);
+        }
+
+        function addToHistory(swara, pitch) {
+            const historyStrip = document.getElementById('historyStrip');
+            const historyItem = document.createElement('div');
+            historyItem.className = `history-item ${pitch}-pitch`;
+            historyItem.textContent = ts(swara);
+            historyStrip.appendChild(historyItem);
+            
+            // Auto-scroll to the end
+            historyStrip.scrollLeft = historyStrip.scrollWidth;
+        }
+
+        function animateHeaderTransition(text, callback) {
+            const header = document.getElementById('mainHeader');
+            header.style.opacity = '0';
+            
+            setTimeout(() => {
+                header.textContent = text;
+                header.style.opacity = '1';
+                callback();
+            }, 300);
+        }
+
+        function animateSubheaderTransition(text, callback) {
+            const subheader = document.getElementById('subheaderContainer');
+            subheader.innerHTML = `<div class="subheader">${text}</div>`;
+            callback();
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' && isPlaying) {
+                e.preventDefault();
+                stopPractice();
+            }
+        });
+    </script>
+</body>
+</html>
